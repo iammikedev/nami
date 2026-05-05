@@ -1,19 +1,21 @@
-import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet } from "react-native";
 
 import { FloatingActionButton } from "@/src/ui/components";
 import { spacing, useNamiColors } from "@/src/ui/theme";
 
-export function HomeFloatingLogButton() {
+type HomeFloatingLogButtonProps = {
+  onPress?: () => void;
+};
+
+export function HomeFloatingLogButton({ onPress }: HomeFloatingLogButtonProps) {
   const theme = useNamiColors();
-  const router = useRouter();
 
   return (
     <FloatingActionButton
       label="Log"
       iconName="plus"
-      onPress={() => router.push("/quick-log")}
+      onPress={onPress}
       textColor={theme.surfaceElevated}
       iconColor={theme.surfaceElevated}
       borderColor={theme.surfaceElevated}
