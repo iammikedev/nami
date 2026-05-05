@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, View } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 import type { HomeBabyProfile } from "@/src/features/home/types/home.types";
+import { getBabyAgeLabel } from "@/src/features/home/utils/babyAge";
 import { AppText } from "@/src/ui/components";
 import { layout, shadows, spacing, useNamiColors } from "@/src/ui/theme";
 
@@ -13,6 +14,7 @@ type HomeHeaderProps = {
 
 export function HomeHeader({ baby }: HomeHeaderProps) {
   const theme = useNamiColors();
+  const ageLabel = baby.ageLabel ?? getBabyAgeLabel(baby.birthdate);
 
   return (
     <View style={styles.root}>
@@ -25,7 +27,7 @@ export function HomeHeader({ baby }: HomeHeaderProps) {
           />
         </View>
         <View style={styles.copy}>
-          <AppText variant="h2">{`${baby.name} • ${baby.ageLabel}`}</AppText>
+          <AppText variant="h2">{`${baby.name} • ${ageLabel}`}</AppText>
           <AppText color="textSecondary">Here&apos;s today&apos;s little moments.</AppText>
         </View>
       </View>

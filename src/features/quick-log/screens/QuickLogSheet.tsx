@@ -1,7 +1,7 @@
 import * as Haptics from "expo-haptics";
 import { useRealm } from "@realm/react";
 import { Box, VStack } from "native-base";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Alert,
   LayoutAnimation,
@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { FeedLogForm } from "@/src/features/quick-log/components/FeedLogForm";
 import { LogTypeGrid } from "@/src/features/quick-log/components/LogTypeGrid";
+import { SleepLogForm } from "@/src/features/quick-log/components/SleepLogForm";
 import { useQuickLogStore } from "@/src/features/quick-log/store/quickLogStore";
 import type { LogType } from "@/src/features/quick-log/types/quickLog.types";
 import { AppButton, AppText, IconButton } from "@/src/ui/components";
@@ -25,29 +26,53 @@ import { radius, shadows, spacing, useNamiColors } from "@/src/ui/theme";
 type QuickLogSheetProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSaved?: () => void;
+  /** Called after a log is persisted; use for refresh + toast. */
+  onLogComplete?: (message: string) => void;
+  /** When set, opening the sheet skips the type grid and shows this flow. */
+  initialLogType?: LogType;
 };
 
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-export function QuickLogSheet({ isOpen, onClose, onSaved }: QuickLogSheetProps) {
+export function QuickLogSheet({
+  isOpen,
+  onClose,
+  onLogComplete,
+  initialLogType,
+}: QuickLogSheetProps) {
   const theme = useNamiColors();
   const insets = useSafeAreaInsets();
   const realm = useRealm();
   const saveFeedLog = useQuickLogStore((state) => state.saveFeedLog);
   const [selectedType, setSelectedType] = useState<LogType>();
   const [hasRunningTimer, setHasRunningTimer] = useState(false);
+  const wasOpenRef = useRef(false);
+
+  useEffect(() => {
+    const wasOpen = wasOpenRef.current;
+    wasOpenRef.current = isOpen;
+    if (!isOpen) {
+      setSelectedType(undefined);
+      setHasRunningTimer(false);
+      return;
+    }
+    if (!wasOpen) {
+      setSelectedType(initialLogType);
+    }
+  }, [isOpen, initialLogType]);
 
   const title = useMemo(() => {
     if (selectedType === "feed") return "Quick Feed";
+    if (selectedType === "sleep") return "Sleep";
     return "Quick Log";
   }, [selectedType]);
 
   const subtitle = useMemo(() => {
     if (!selectedType) return "What would you like to log?";
     if (selectedType === "feed") return "Fast path: Left + 10 min + Save";
+    if (selectedType === "sleep") return "Track naps and bedtime in seconds.";
     return "This flow is coming soon.";
   }, [selectedType]);
 
@@ -143,7 +168,15 @@ export function QuickLogSheet({ isOpen, onClose, onSaved }: QuickLogSheetProps) 
                 onRunningTimerChange={setHasRunningTimer}
                 onSave={(payload) => {
                   saveFeedLog(payload, realm);
-                  onSaved?.();
+                  onLogComplete?.("Feed saved.");
+                  resetAndClose();
+                }}
+              />
+            ) : selectedType === "sleep" ? (
+              <SleepLogForm
+                realm={realm}
+                onComplete={(message) => {
+                  onLogComplete?.(message);
                   resetAndClose();
                 }}
               />

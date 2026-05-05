@@ -23,13 +23,21 @@ export function SummaryCard({ item, onPress }: HomeSummaryCardProps) {
   const theme = useNamiColors();
 
   return (
-    <Pressable onPress={onPress} className="flex-1">
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`Log ${item.label.toLowerCase()}`}
+      className="flex-1"
+    >
       {({ isPressed }) => (
         <VStack
           alignItems="center"
           justifyContent="center"
           className={`min-h-[174px] w-full flex-1 gap-0.5 rounded-[20px] border border-[rgba(47,58,52,0.05)] px-2 py-3 ${activityCardBgClass[item.type]}`}
-          style={[{ opacity: isPressed ? 0.94 : 1 }, shadows.sm]}
+          style={[
+            { opacity: isPressed ? 0.94 : 1, transform: [{ scale: isPressed ? 0.98 : 1 }] },
+            shadows.sm,
+          ]}
         >
           <Box className="mb-1 h-[72px] w-[72px] items-center justify-center rounded-full bg-white/[0.52]">
             <MaterialCommunityIcons

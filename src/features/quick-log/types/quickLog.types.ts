@@ -14,3 +14,13 @@ export type FeedLog = {
   endedAt?: Date;
   createdAt: Date;
 };
+
+export type SleepLog = {
+  id: string;
+  type: "sleep";
+  status: "active" | "completed";
+  startedAt?: string;
+  endedAt?: string;
+  durationMinutes?: number;
+  createdAt: string;
+};
