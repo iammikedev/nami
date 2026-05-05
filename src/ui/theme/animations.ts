@@ -1,16 +1,21 @@
+import { Easing } from "react-native";
+
 export const animations = {
   duration: {
-    instant: 100,
-    fast: 160,
-    normal: 240,
-    slow: 320,
+    fast: 150,
+    normal: 250,
+    slow: 350,
+  },
+  easing: {
+    easeOut: Easing.out(Easing.cubic),
+    easeInOut: Easing.inOut(Easing.cubic),
   },
   scale: {
     pressIn: 0.97,
     pressOut: 1,
   },
   opacity: {
-    pressIn: 0.85,
+    pressIn: 0.9,
     pressOut: 1,
   },
 } as const;

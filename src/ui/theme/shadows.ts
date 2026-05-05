@@ -1,29 +1,25 @@
-import { Platform, ViewStyle } from "react-native";
-
-const iosShadow = (opacity: number, radius: number, y: number): ViewStyle => ({
-  shadowColor: "#2F3A34",
-  shadowOpacity: opacity,
-  shadowRadius: radius,
-  shadowOffset: { width: 0, height: y },
-});
-
-const androidShadow = (elevation: number): ViewStyle => ({
-  elevation,
-  shadowColor: "#2F3A34",
-});
+import type { ViewStyle } from "react-native";
 
 export const shadows = {
-  none: {} as ViewStyle,
-  sm:
-    Platform.OS === "ios"
-      ? iosShadow(0.07, 6, 2)
-      : androidShadow(2),
-  md:
-    Platform.OS === "ios"
-      ? iosShadow(0.1, 10, 4)
-      : androidShadow(4),
-  lg:
-    Platform.OS === "ios"
-      ? iosShadow(0.14, 16, 8)
-      : androidShadow(8),
-} as const;
+  sm: {
+    shadowColor: "#2F3A34",
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
+  md: {
+    shadowColor: "#2F3A34",
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+  },
+  lg: {
+    shadowColor: "#2F3A34",
+    shadowOpacity: 0.14,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 7,
+  },
+} as const satisfies Record<string, ViewStyle>;
