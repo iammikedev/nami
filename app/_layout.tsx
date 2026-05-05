@@ -16,6 +16,7 @@ import { View } from "react-native";
 import { Task } from "@/constants/task";
 import { ActivityLog, BabyProfile } from "@/src/features/home";
 import { MilestoneRecord } from "@/src/features/milestones";
+import { ReminderSettings } from "@/src/features/reminders";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import {
   OnboardingProfile,
@@ -30,7 +31,9 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <RealmProvider schema={[Task, OnboardingProfile, BabyProfile, ActivityLog, MilestoneRecord]}>
+    <RealmProvider
+      schema={[Task, OnboardingProfile, BabyProfile, ActivityLog, MilestoneRecord, ReminderSettings]}
+    >
       <NativeBaseProvider>
         <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
           <AppNavigator />
@@ -80,6 +83,7 @@ function AppNavigator() {
         options={{ presentation: "modal", title: "Modal" }}
       />
       <Stack.Screen name="quick-log" options={{ title: "Quick Log" }} />
+      <Stack.Screen name="reminder-settings" options={{ headerShown: false, title: "Smart Reminders" }} />
     </Stack>
   );
 }

@@ -23,16 +23,22 @@ const getProfile = (realm: Realm) => {
     return profile;
   }
 
-  let createdProfile: OnboardingProfile;
   realm.write(() => {
-    createdProfile = realm.create(OnboardingProfile.schema.name, {
+    realm.create(OnboardingProfile.schema.name, {
       _id: ONBOARDING_PROFILE_ID,
       onboardingCompleted: false,
       updatedAt: new Date(),
     });
   });
 
-  return createdProfile!;
+  const createdProfile = realm.objectForPrimaryKey<OnboardingProfile>(
+    OnboardingProfile.schema.name,
+    ONBOARDING_PROFILE_ID
+  );
+  if (!createdProfile) {
+    throw new Error("OnboardingProfile missing after create");
+  }
+  return createdProfile;
 };
 
 export const useOnboardingStore = create<OnboardingStore>((set) => ({

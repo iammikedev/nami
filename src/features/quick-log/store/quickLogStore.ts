@@ -16,6 +16,11 @@ import {
   parseSleepMetadata,
   type SleepActivityMetadata,
 } from "@/src/features/quick-log/utils/sleep.utils";
+import {
+  onFeedLogSaved,
+  onSleepSessionStarted,
+  onSleepWakeLogged,
+} from "@/src/features/reminders/services/reminderSync";
 
 type SaveFeedInput = {
   method: FeedMethod;
@@ -106,6 +111,10 @@ export const useQuickLogStore = create<QuickLogStore>((set, get) => ({
       set((state) => ({ inMemoryFeedLogs: [feedLog, ...state.inMemoryFeedLogs] }));
     }
 
+    if (realm) {
+      void onFeedLogSaved(realm);
+    }
+
     return feedLog;
   },
 
@@ -167,6 +176,7 @@ export const useQuickLogStore = create<QuickLogStore>((set, get) => ({
           updatedAt: now,
         });
       });
+      void onSleepSessionStarted(realm);
     } else {
       if (get().inMemorySleepLogs.some((l) => l.status === "active")) {
         return { ok: false, error: "A sleep session is already in progress." };
@@ -224,6 +234,8 @@ export const useQuickLogStore = create<QuickLogStore>((set, get) => ({
         active.metadata = JSON.stringify(completedMeta);
         active.updatedAt = now;
       });
+
+      void onSleepWakeLogged(realm);
 
       const log: SleepLog = {
         id: active.id,
@@ -293,6 +305,7 @@ export const useQuickLogStore = create<QuickLogStore>((set, get) => ({
           updatedAt: now,
         });
       });
+      void onSleepWakeLogged(realm);
     } else {
       const log: SleepLog = {
         id,
