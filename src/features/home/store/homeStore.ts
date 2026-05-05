@@ -10,7 +10,7 @@ import type {
 } from "@/src/features/home/types/home.types";
 import { getRelativeTimeLabel, getStartAndEndOfToday } from "@/src/features/home/utils/dateFormat";
 import { useQuickLogStore } from "@/src/features/quick-log/store/quickLogStore";
-import type { FeedLog, SleepLog } from "@/src/features/quick-log/types/quickLog.types";
+import type { DiaperLog, FeedLog, SleepLog } from "@/src/features/quick-log/types/quickLog.types";
 import { formatSleepDurationShort } from "@/src/features/quick-log/utils/sleep.utils";
 import { ActivityLog, BABY_PROFILE_SINGLETON_ID, BabyProfile } from "./homeModels";
 
@@ -78,11 +78,30 @@ function mapSleepLogToRecent(log: SleepLog): RecentActivityItem {
   };
 }
 
+function mapDiaperLogToRecent(log: DiaperLog): RecentActivityItem {
+  const createdAt = new Date(log.createdAt);
+  const subtitle =
+    log.diaperType === "wet"
+      ? "Wet"
+      : log.diaperType === "dirty"
+        ? "Dirty"
+        : "Wet & dirty";
+  return {
+    id: log.id,
+    type: mapTypeToActivityColor("diaper"),
+    title: "Diaper",
+    subtitle,
+    createdAt,
+    relativeTime: getRelativeTimeLabel(createdAt),
+  };
+}
+
 function mergeQuickLogMemoryWithRecent(realmItems: RecentActivityItem[]): RecentActivityItem[] {
   const quick = useQuickLogStore.getState();
   const fromMemory = [
     ...quick.inMemoryFeedLogs.map(mapFeedLogToRecent),
     ...quick.inMemorySleepLogs.map(mapSleepLogToRecent),
+    ...quick.inMemoryDiaperLogs.map(mapDiaperLogToRecent),
   ];
   const seen = new Set(realmItems.map((i) => i.id));
   return [...fromMemory.filter((i) => !seen.has(i.id)), ...realmItems]

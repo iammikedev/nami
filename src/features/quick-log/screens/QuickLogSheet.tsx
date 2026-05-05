@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { DiaperLogForm } from "@/src/features/quick-log/components/DiaperLogForm";
 import { FeedLogForm } from "@/src/features/quick-log/components/FeedLogForm";
 import { LogTypeGrid } from "@/src/features/quick-log/components/LogTypeGrid";
 import { SleepLogForm } from "@/src/features/quick-log/components/SleepLogForm";
@@ -66,6 +67,7 @@ export function QuickLogSheet({
   const title = useMemo(() => {
     if (selectedType === "feed") return "Quick Feed";
     if (selectedType === "sleep") return "Sleep";
+    if (selectedType === "diaper") return "Diaper";
     return "Quick Log";
   }, [selectedType]);
 
@@ -73,6 +75,7 @@ export function QuickLogSheet({
     if (!selectedType) return "What would you like to log?";
     if (selectedType === "feed") return "Fast path: Left + 10 min + Save";
     if (selectedType === "sleep") return "Track naps and bedtime in seconds.";
+    if (selectedType === "diaper") return "Wet, dirty, or both — tap one, then save.";
     return "This flow is coming soon.";
   }, [selectedType]);
 
@@ -150,42 +153,58 @@ export function QuickLogSheet({
               ) : null}
             </VStack>
           </View>
-          <ScrollView
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.scrollContent}
-          >
-            {!selectedType ? (
-              <LogTypeGrid
-                onSelect={(type) => {
-                  void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-                  setSelectedType(type);
-                }}
-              />
-            ) : selectedType === "feed" ? (
-              <FeedLogForm
-                onRunningTimerChange={setHasRunningTimer}
-                onSave={(payload) => {
-                  saveFeedLog(payload, realm);
-                  onLogComplete?.("Feed saved.");
-                  resetAndClose();
-                }}
-              />
-            ) : selectedType === "sleep" ? (
-              <SleepLogForm
+          {selectedType === "diaper" ? (
+            <View style={styles.diaperFlow}>
+              <DiaperLogForm
                 realm={realm}
-                onComplete={(message) => {
-                  onLogComplete?.(message);
+                onBack={() => {
+                  LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                  setSelectedType(undefined);
+                }}
+                onSave={() => {
+                  onLogComplete?.("Diaper saved");
                   resetAndClose();
                 }}
               />
-            ) : (
-              <Box className="rounded-2xl border border-[#E8DCCF] bg-white px-4 py-5">
-                <AppText color="textSecondary">This activity flow is coming soon.</AppText>
-              </Box>
-            )}
-          </ScrollView>
+            </View>
+          ) : (
+            <ScrollView
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.scrollContent}
+            >
+              {!selectedType ? (
+                <LogTypeGrid
+                  onSelect={(type) => {
+                    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                    setSelectedType(type);
+                  }}
+                />
+              ) : selectedType === "feed" ? (
+                <FeedLogForm
+                  onRunningTimerChange={setHasRunningTimer}
+                  onSave={(payload) => {
+                    saveFeedLog(payload, realm);
+                    onLogComplete?.("Feed saved.");
+                    resetAndClose();
+                  }}
+                />
+              ) : selectedType === "sleep" ? (
+                <SleepLogForm
+                  realm={realm}
+                  onComplete={(message) => {
+                    onLogComplete?.(message);
+                    resetAndClose();
+                  }}
+                />
+              ) : (
+                <Box className="rounded-2xl border border-[#E8DCCF] bg-white px-4 py-5">
+                  <AppText color="textSecondary">This activity flow is coming soon.</AppText>
+                </Box>
+              )}
+            </ScrollView>
+          )}
         </View>
       </View>
     </Modal>
@@ -217,6 +236,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing[3],
   },
   scrollContent: {
+    paddingBottom: spacing[4],
+  },
+  diaperFlow: {
     paddingBottom: spacing[4],
   },
 });

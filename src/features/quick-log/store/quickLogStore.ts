@@ -2,7 +2,14 @@ import Realm from "realm";
 import { create } from "zustand";
 
 import { ActivityLog } from "@/src/features/home/store/homeModels";
-import type { BreastSide, FeedLog, FeedMethod, SleepLog } from "@/src/features/quick-log/types/quickLog.types";
+import type {
+  BreastSide,
+  DiaperLog,
+  DiaperType,
+  FeedLog,
+  FeedMethod,
+  SleepLog,
+} from "@/src/features/quick-log/types/quickLog.types";
 import {
   findActiveSleepLogInRealm,
   formatSleepDurationShort,
@@ -30,10 +37,18 @@ type SleepOpResult =
   | { ok: true; log: SleepLog }
   | { ok: false; error: string };
 
+function diaperActivitySubtitle(diaperType: DiaperType): string {
+  if (diaperType === "wet") return "Wet";
+  if (diaperType === "dirty") return "Dirty";
+  return "Wet & dirty";
+}
+
 type QuickLogStore = {
   inMemoryFeedLogs: FeedLog[];
   inMemorySleepLogs: SleepLog[];
+  inMemoryDiaperLogs: DiaperLog[];
   saveFeedLog: (input: SaveFeedInput, realm?: Realm) => FeedLog;
+  saveDiaperLog: (diaperType: DiaperType, realm?: Realm) => DiaperLog;
   startSleepSession: (realm?: Realm) => SleepOpResult;
   endSleepSession: (realm?: Realm) => SleepOpResult;
   saveCompletedSleepLog: (durationMinutes: number, realm?: Realm) => SleepLog;
@@ -42,6 +57,7 @@ type QuickLogStore = {
 export const useQuickLogStore = create<QuickLogStore>((set, get) => ({
   inMemoryFeedLogs: [],
   inMemorySleepLogs: [],
+  inMemoryDiaperLogs: [],
   saveFeedLog: (input, realm) => {
     const now = new Date();
     const id = newRealmId();
@@ -91,6 +107,40 @@ export const useQuickLogStore = create<QuickLogStore>((set, get) => ({
     }
 
     return feedLog;
+  },
+
+  saveDiaperLog: (diaperType, realm) => {
+    const now = new Date();
+    const id = newRealmId();
+    const createdAt = now.toISOString();
+    const subtitle = diaperActivitySubtitle(diaperType);
+
+    const diaperLog: DiaperLog = {
+      id,
+      type: "diaper",
+      diaperType,
+      createdAt,
+    };
+
+    if (realm) {
+      realm.write(() => {
+        realm.create(ActivityLog.schema.name, {
+          id,
+          type: "diaper",
+          title: "Diaper",
+          subtitle,
+          metadata: JSON.stringify({ diaperType }),
+          createdAt: now,
+          updatedAt: now,
+        });
+      });
+    } else {
+      set((state) => ({
+        inMemoryDiaperLogs: [diaperLog, ...state.inMemoryDiaperLogs],
+      }));
+    }
+
+    return diaperLog;
   },
 
   startSleepSession: (realm) => {

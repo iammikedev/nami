@@ -24,3 +24,12 @@ export type SleepLog = {
   durationMinutes?: number;
   createdAt: string;
 };
+
+export type DiaperType = "wet" | "dirty" | "both";
+
+export type DiaperLog = {
+  id: string;
+  type: "diaper";
+  diaperType: DiaperType;
+  createdAt: string;
+};
