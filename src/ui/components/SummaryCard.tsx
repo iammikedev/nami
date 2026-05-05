@@ -1,6 +1,6 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import React from "react";
 import { Box, HStack, VStack } from "native-base";
+import React from "react";
 
 import { ActivityType, radius, spacing, useNamiColors } from "../theme";
 import { AppText } from "./AppText";
@@ -21,7 +21,14 @@ export function SummaryCard({
 }: SummaryCardProps) {
   const theme = useNamiColors();
   return (
-    <Card style={{ flexDirection: "row", alignItems: "center", gap: spacing[3], padding: spacing[3] }}>
+    <Card
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        gap: spacing[3],
+        padding: spacing[3],
+      }}
+    >
       <Box
         style={{
           width: 36,

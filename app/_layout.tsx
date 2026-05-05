@@ -14,6 +14,7 @@ import { NativeBaseProvider } from "native-base";
 import { View } from "react-native";
 
 import { Task } from "@/constants/task";
+import { ActivityLog, BabyProfile } from "@/src/features/home";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import {
   OnboardingProfile,
@@ -28,7 +29,7 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <RealmProvider schema={[Task, OnboardingProfile]}>
+    <RealmProvider schema={[Task, OnboardingProfile, BabyProfile, ActivityLog]}>
       <NativeBaseProvider>
         <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
           <AppNavigator />
@@ -77,6 +78,7 @@ function AppNavigator() {
         name="modal"
         options={{ presentation: "modal", title: "Modal" }}
       />
+      <Stack.Screen name="quick-log" options={{ title: "Quick Log" }} />
     </Stack>
   );
 }
