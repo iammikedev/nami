@@ -1,0 +1,84 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Expo: Start Dev Server",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run start",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Expo: Start + iOS Simulator",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npx expo start --ios",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Expo: Start + Android Emulator",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npx expo start --android",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Expo: Start Web",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run web",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Expo: Run iOS (Dev Client)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run ios",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Expo: Run Android (Dev Client)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run android",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Debug Web (Chrome @19006)",
+      "type": "pwa-chrome",
+      "request": "launch",
+      "url": "http://localhost:19006",
+      "webRoot": "${workspaceFolder}"
+    },
+    {
+      "name": "Attach: React Native (Hermes / Metro 8081)",
+      "type": "reactnative",
+      "request": "attach",
+      "cwd": "${workspaceFolder}",
+      "port": 8081
+    }
+  ],
+  "compounds": [
+    {
+      "name": "iOS: Run + Attach Hermes",
+      "configurations": [
+        "Expo: Run iOS (Dev Client)",
+        "Attach: React Native (Hermes / Metro 8081)"
+      ],
+      "stopAll": true
+    },
+    {
+      "name": "Android: Run + Attach Hermes",
+      "configurations": [
+        "Expo: Run Android (Dev Client)",
+        "Attach: React Native (Hermes / Metro 8081)"
+      ],
+      "stopAll": true
+    },
+    {
+      "name": "Web: Start + Debug Chrome",
+      "configurations": ["Expo: Start Web", "Debug Web (Chrome @19006)"],
+      "stopAll": true
+    }
+  ]
+}
