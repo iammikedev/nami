@@ -1,21 +1,20 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useRealm } from "@realm/react";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Box } from "native-base";
 import React, { useMemo, useState } from "react";
 import { Pressable, View } from "react-native";
 
-import { OnboardingProgressPill } from "@/src/features/onboarding/components";
-import { useOnboardingStore } from "@/src/features/onboarding/store/onboardingStore";
+import {
+  OnboardingPaginationDots,
+  OnboardingProgressPill,
+} from "@/src/features/onboarding/components";
 import { OnboardingOption } from "@/src/features/onboarding/types/onboarding.types";
 import { AppButton, AppScreen, AppText } from "@/src/ui/components";
 import { animations, useAppColors } from "@/src/ui/theme";
 
 export function OnboardingScreen() {
-  const realm = useRealm();
   const router = useRouter();
-  const { completeOnboarding } = useOnboardingStore();
   const theme = useAppColors();
   const [selectedId, setSelectedId] =
     useState<OnboardingOption["id"]>("feeding");
@@ -52,8 +51,7 @@ export function OnboardingScreen() {
   );
 
   const handleGetStarted = () => {
-    completeOnboarding(realm, {});
-    router.replace("/(tabs)");
+    router.push("/onboarding/baby-setup");
   };
 
   const renderOptionCard = (option: OnboardingOption) => (
@@ -103,17 +101,6 @@ export function OnboardingScreen() {
             {option.subtitle}
           </AppText>
         </Box>
-        <Box
-          className="h-[34px] w-[34px] items-center justify-center rounded-full"
-          shadow={1}
-          style={{ backgroundColor: theme.surfaceElevated }}
-        >
-          <MaterialCommunityIcons
-            name="chevron-right"
-            size={18}
-            color={theme.textSecondary}
-          />
-        </Box>
       </Box>
     </Pressable>
   );
@@ -123,7 +110,7 @@ export function OnboardingScreen() {
       <View className="flex-1 gap-4">
         <View className="flex-row items-start justify-between">
           <View />
-          <OnboardingProgressPill step={1} totalSteps={1} />
+          <OnboardingProgressPill step={2} totalSteps={3} />
         </View>
 
         <View className=" justify-center gap-2">
@@ -165,13 +152,14 @@ export function OnboardingScreen() {
         </View>
         <View className="gap-3">{options.map(renderOptionCard)}</View>
 
-        <View className="mt-auto gap-3 pt-3">
+        <View className="mt-auto gap-5 pt-3">
           <AppButton
             label="Get Started"
             onPress={handleGetStarted}
             variant="hero3d"
             className="w-full"
           />
+          <OnboardingPaginationDots activeIndex={1} total={3} />
         </View>
       </View>
     </AppScreen>
