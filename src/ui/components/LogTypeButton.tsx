@@ -19,8 +19,8 @@ export function LogTypeButton({ type, label, onPress }: LogTypeButtonProps) {
   return (
     <Pressable
       onPress={onPress}
-      style={({ isPressed }) => [
-        { alignItems: "center", minWidth: 74, gap: spacing[2], opacity: isPressed ? 0.85 : 1 },
+      style={({ pressed }) => [
+        { alignItems: "center", minWidth: 74, gap: spacing[2], opacity: pressed ? 0.85 : 1 },
       ]}
     >
       <Box

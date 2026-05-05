@@ -1,6 +1,6 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Box, HStack, VStack } from "native-base";
 import React from "react";
-import { HStack, VStack, Box } from "native-base";
 
 import { ActivityType, radius, spacing, useNamiColors } from "../theme";
 import { AppText } from "./AppText";
@@ -33,11 +33,11 @@ export function ActivityCard({
             backgroundColor: theme.activity[type],
           }}
         >
-        <MaterialCommunityIcons
-          name="star-four-points-outline"
-          size={18}
-          color={theme.textPrimary}
-        />
+          <MaterialCommunityIcons
+            name="star-four-points-outline"
+            size={18}
+            color={theme.textPrimary}
+          />
         </Box>
         <VStack flex={1} space={0.5}>
           <AppText variant="title">{title}</AppText>
