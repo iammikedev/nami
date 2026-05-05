@@ -58,6 +58,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="milestones"
+        options={{
+          title: "Milestones",
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name="star-outline" size={22} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="insights"
         options={{
           title: "Insights",

@@ -16,6 +16,8 @@ type InputFieldProps = TextInputProps & {
   icon?: keyof typeof MaterialCommunityIcons.glyphMap;
   containerStyle?: StyleProp<ViewStyle>;
   error?: boolean;
+  /** When true, field grows for notes; uses a taller min height. */
+  multiline?: boolean;
 };
 
 export function InputField({
@@ -23,6 +25,7 @@ export function InputField({
   containerStyle,
   style,
   error,
+  multiline,
   ...props
 }: InputFieldProps) {
   const theme = useNamiColors();
@@ -36,13 +39,15 @@ export function InputField({
 
   const shellStyle: ViewStyle = {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: multiline ? "flex-start" : "center",
     borderWidth: formFieldMetrics.borderWidth,
     borderRadius: formFieldMetrics.borderRadius,
     borderColor,
     backgroundColor: theme.surfaceElevated,
     paddingHorizontal: formFieldMetrics.paddingHorizontal,
-    minHeight: formFieldMetrics.minHeight,
+    minHeight: multiline ? 120 : formFieldMetrics.minHeight,
+    paddingTop: multiline ? spacing[3] : 0,
+    paddingBottom: multiline ? spacing[3] : 0,
   };
 
   const inputStyle: StyleProp<TextStyle> = [
@@ -62,6 +67,8 @@ export function InputField({
       <View style={shellStyle}>
         <TextInput
           {...props}
+          multiline={multiline}
+          textAlignVertical={multiline ? "top" : "center"}
           placeholderTextColor={theme.textSecondary}
           onFocus={(e) => {
             setFocused(true);

@@ -15,6 +15,7 @@ import { View } from "react-native";
 
 import { Task } from "@/constants/task";
 import { ActivityLog, BabyProfile } from "@/src/features/home";
+import { MilestoneRecord } from "@/src/features/milestones";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import {
   OnboardingProfile,
@@ -29,7 +30,7 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <RealmProvider schema={[Task, OnboardingProfile, BabyProfile, ActivityLog]}>
+    <RealmProvider schema={[Task, OnboardingProfile, BabyProfile, ActivityLog, MilestoneRecord]}>
       <NativeBaseProvider>
         <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
           <AppNavigator />
