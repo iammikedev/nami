@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from "react";
+import React, { PropsWithChildren, ReactNode } from "react";
 import { Box, ScrollView } from "native-base";
 import {
   KeyboardAvoidingView,
@@ -15,6 +15,8 @@ type AppScreenProps = PropsWithChildren<{
   keyboardAvoiding?: boolean;
   style?: StyleProp<ViewStyle>;
   contentStyle?: StyleProp<ViewStyle>;
+  /** Siblings rendered outside the scroll/body, still inside SafeAreaView (FAB, toasts, etc.). */
+  screenOverlay?: ReactNode;
 }>;
 
 export function AppScreen({
@@ -23,6 +25,7 @@ export function AppScreen({
   keyboardAvoiding = false,
   style,
   contentStyle,
+  screenOverlay,
 }: AppScreenProps) {
   const theme = useNamiColors();
 
@@ -37,6 +40,7 @@ export function AppScreen({
 
   const body = scrollable ? (
     <ScrollView
+      style={{ flex: 1 }}
       contentContainerStyle={paddedContentStyle}
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
@@ -61,6 +65,7 @@ export function AppScreen({
   return (
     <SafeAreaView style={[{ flex: 1, backgroundColor: theme.background }, style]}>
       {wrapped}
+      {screenOverlay}
     </SafeAreaView>
   );
 }

@@ -3,14 +3,15 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Animated, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { HomeFloatingLogButton } from "@/src/features/home/components/HomeFloatingLogButton";
 import { HomeHeader } from "@/src/features/home/components/HomeHeader";
 import { RecentActivityList } from "@/src/features/home/components/RecentActivityList";
 import { TodaySummary } from "@/src/features/home/components/TodaySummary";
 import { homeDailyHubMock } from "@/src/features/home/data/home.mock";
+import type { SummaryType } from "@/src/features/home/types/home.types";
 import { useHomeStore } from "@/src/features/home/store/homeStore";
 import { buildTodaySummaryItems } from "@/src/features/home/utils/summary";
 import { QuickLogSheet } from "@/src/features/quick-log";
+import type { LogType } from "@/src/features/quick-log/types/quickLog.types";
 import { AppScreen, AppText } from "@/src/ui/components";
 import { animations, radius, shadows, spacing, useNamiColors } from "@/src/ui/theme";
 
@@ -19,6 +20,7 @@ export function HomeScreen() {
   const insets = useSafeAreaInsets();
   const realm = useRealm();
   const [isQuickLogOpen, setQuickLogOpen] = useState(false);
+  const [quickLogInitialType, setQuickLogInitialType] = useState<LogType | undefined>();
   const [flashMessage, setFlashMessage] = useState<string | null>(null);
   const flashOpacity = useRef(new Animated.Value(0)).current;
   const flashHideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -94,15 +96,72 @@ export function HomeScreen() {
     day: "numeric",
   }), []);
 
+  const openQuickLogForSummary = (summaryType: SummaryType) => {
+    setQuickLogInitialType(summaryType);
+    setQuickLogOpen(true);
+  };
+
+  const closeQuickLog = () => {
+    setQuickLogOpen(false);
+    setQuickLogInitialType(undefined);
+  };
+
   return (
     <AppScreen
       scrollable
       contentStyle={{
         paddingHorizontal: spacing[4],
         paddingTop: spacing[4],
-        paddingBottom: 210,
+        paddingBottom: 120,
         gap: spacing[5],
       }}
+      screenOverlay={
+        <>
+          <QuickLogSheet
+            isOpen={isQuickLogOpen}
+            initialLogType={quickLogInitialType}
+            onClose={closeQuickLog}
+            onLogComplete={(message) => {
+              refreshHomeData(realm);
+              showFlashMessage(message);
+            }}
+          />
+
+          {flashMessage ? (
+            <Animated.View
+              pointerEvents="none"
+              accessibilityLiveRegion="polite"
+              accessibilityLabel={flashMessage}
+              style={[
+                StyleSheet.absoluteFillObject,
+                {
+                  alignItems: "center",
+                  paddingTop: insets.top + spacing[2],
+                },
+                { opacity: flashOpacity },
+              ]}
+            >
+              <View
+                style={[
+                  {
+                    paddingHorizontal: spacing[4],
+                    paddingVertical: spacing[2],
+                    borderRadius: radius.pill,
+                    backgroundColor: theme.surfaceElevated,
+                    borderWidth: 1,
+                    borderColor: theme.border,
+                  },
+                  shadows.md,
+                ]}
+              >
+                <AppText variant="bodySmall" color="success">
+                  {flashMessage}
+                </AppText>
+              </View>
+            </Animated.View>
+          ) : null}
+        </>
+      }
     >
       <Animated.View
         style={{
@@ -112,56 +171,9 @@ export function HomeScreen() {
         }}
       >
         <HomeHeader baby={babyProfile ?? homeDailyHubMock.baby} />
-        <TodaySummary dateLabel={dateLabel} items={summaryItems} />
+        <TodaySummary dateLabel={dateLabel} items={summaryItems} onCardPress={openQuickLogForSummary} />
         <RecentActivityList items={recentActivities} />
       </Animated.View>
-
-      <View pointerEvents="box-none" style={StyleSheet.absoluteFillObject}>
-        <HomeFloatingLogButton onPress={() => setQuickLogOpen(true)} />
-      </View>
-
-      <QuickLogSheet
-        isOpen={isQuickLogOpen}
-        onClose={() => setQuickLogOpen(false)}
-        onSaved={() => {
-          refreshHomeData(realm);
-          showFlashMessage("Feed saved.");
-        }}
-      />
-
-      {flashMessage ? (
-        <Animated.View
-          pointerEvents="none"
-          accessibilityLiveRegion="polite"
-          accessibilityLabel={flashMessage}
-          style={[
-            StyleSheet.absoluteFillObject,
-            {
-              alignItems: "center",
-              paddingTop: insets.top + spacing[2],
-            },
-            { opacity: flashOpacity },
-          ]}
-        >
-          <View
-            style={[
-              {
-                paddingHorizontal: spacing[4],
-                paddingVertical: spacing[2],
-                borderRadius: radius.pill,
-                backgroundColor: theme.surfaceElevated,
-                borderWidth: 1,
-                borderColor: theme.border,
-              },
-              shadows.md,
-            ]}
-          >
-            <AppText variant="bodySmall" color="success">
-              {flashMessage}
-            </AppText>
-          </View>
-        </Animated.View>
-      ) : null}
     </AppScreen>
   );
 }

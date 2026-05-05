@@ -9,6 +9,9 @@ import type {
   TodaySummary,
 } from "@/src/features/home/types/home.types";
 import { getRelativeTimeLabel, getStartAndEndOfToday } from "@/src/features/home/utils/dateFormat";
+import { useQuickLogStore } from "@/src/features/quick-log/store/quickLogStore";
+import type { FeedLog, SleepLog } from "@/src/features/quick-log/types/quickLog.types";
+import { formatSleepDurationShort } from "@/src/features/quick-log/utils/sleep.utils";
 import { ActivityLog, BABY_PROFILE_SINGLETON_ID, BabyProfile } from "./homeModels";
 
 type HomeStore = {
@@ -36,6 +39,55 @@ function mapTypeToActivityColor(type: HomeActivityType) {
   if (type === "diaper") return "diaper";
   if (type === "milestone") return "milestone";
   return "feed";
+}
+
+function mapFeedLogToRecent(log: FeedLog): RecentActivityItem {
+  const subtitle =
+    log.method === "breastfeed"
+      ? `${log.side === "left" ? "Left" : "Right"} • ${log.durationMinutes ?? 0} mins`
+      : `${log.amountMl ?? 0} ml`;
+  const title =
+    log.method === "breastfeed"
+      ? `Fed (${log.side === "left" ? "Left" : "Right"})`
+      : "Fed (Bottle)";
+  return {
+    id: log.id,
+    type: mapTypeToActivityColor("feed"),
+    title,
+    subtitle,
+    createdAt: log.createdAt,
+    relativeTime: getRelativeTimeLabel(log.createdAt),
+  };
+}
+
+function mapSleepLogToRecent(log: SleepLog): RecentActivityItem {
+  const createdAt = new Date(log.createdAt);
+  const subtitle =
+    log.status === "active"
+      ? "In progress"
+      : log.durationMinutes != null
+        ? formatSleepDurationShort(log.durationMinutes)
+        : undefined;
+  return {
+    id: log.id,
+    type: mapTypeToActivityColor("sleep"),
+    title: log.status === "active" ? "Sleep" : "Slept",
+    subtitle,
+    createdAt,
+    relativeTime: getRelativeTimeLabel(createdAt),
+  };
+}
+
+function mergeQuickLogMemoryWithRecent(realmItems: RecentActivityItem[]): RecentActivityItem[] {
+  const quick = useQuickLogStore.getState();
+  const fromMemory = [
+    ...quick.inMemoryFeedLogs.map(mapFeedLogToRecent),
+    ...quick.inMemorySleepLogs.map(mapSleepLogToRecent),
+  ];
+  const seen = new Set(realmItems.map((i) => i.id));
+  return [...fromMemory.filter((i) => !seen.has(i.id)), ...realmItems]
+    .sort((a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0))
+    .slice(0, 5);
 }
 
 function getOrCreateBabyProfileFromOnboarding(realm: Realm): HomeBabyProfile | null {
@@ -125,7 +177,7 @@ export const useHomeStore = create<HomeStore>((set) => ({
     const state = useHomeStore.getState();
     const babyProfile = state.loadBabyProfile(realm);
     const todaySummary = state.loadTodaySummary(realm);
-    const recentActivities = state.loadRecentActivities(realm);
+    const recentActivities = mergeQuickLogMemoryWithRecent(state.loadRecentActivities(realm));
 
     set({
       babyProfile,

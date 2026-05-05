@@ -1,8 +1,9 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import * as Haptics from "expo-haptics";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
-import type { TodaySummaryItem } from "@/src/features/home/types/home.types";
+import type { SummaryType, TodaySummaryItem } from "@/src/features/home/types/home.types";
 import { AppText } from "@/src/ui/components";
 import { radius, shadows, spacing, useNamiColors } from "@/src/ui/theme";
 import { SummaryCard } from "./SummaryCard";
@@ -10,9 +11,10 @@ import { SummaryCard } from "./SummaryCard";
 type TodaySummaryProps = {
   dateLabel: string;
   items: TodaySummaryItem[];
+  onCardPress?: (type: SummaryType) => void;
 };
 
-export function TodaySummary({ dateLabel, items }: TodaySummaryProps) {
+export function TodaySummary({ dateLabel, items, onCardPress }: TodaySummaryProps) {
   const theme = useNamiColors();
 
   return (
@@ -49,7 +51,18 @@ export function TodaySummary({ dateLabel, items }: TodaySummaryProps) {
 
       <View style={styles.cardsRow}>
         {items.map((item) => (
-          <SummaryCard key={item.id} item={item} />
+          <SummaryCard
+            key={item.id}
+            item={item}
+            onPress={
+              onCardPress
+                ? () => {
+                    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    onCardPress(item.id);
+                  }
+                : undefined
+            }
+          />
         ))}
       </View>
     </View>
