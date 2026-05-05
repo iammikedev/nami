@@ -1,5 +1,5 @@
 import { OnboardingScreen } from "@/src/features/onboarding";
 
-export default function OnboardingRoute() {
+export default function OnboardingIndexRoute() {
   return <OnboardingScreen />;
 }

@@ -13,6 +13,7 @@ type AppButtonProps = {
   onPress?: () => void;
   disabled?: boolean;
   loading?: boolean;
+  accessibilityHint?: string;
   iconRight?: keyof typeof MaterialCommunityIcons.glyphMap;
   iconSize?: number;
   className?: string;
@@ -25,6 +26,7 @@ export function AppButton({
   onPress,
   disabled,
   loading,
+  accessibilityHint,
   iconRight = "arrow-right",
   iconSize = 16,
   className,
@@ -43,6 +45,8 @@ export function AppButton({
     <Pressable
       className={className}
       accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityHint={accessibilityHint}
       disabled={disabled || loading}
       onPress={onPress}
       style={({ pressed }) => [

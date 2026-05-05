@@ -1,34 +1,36 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 
 import { AppText, InputField } from "@/src/ui/components";
-import { radius, spacing, useAppColors } from "@/src/ui/theme";
 
 type BabyNameInputProps = {
   value: string;
   onChangeText: (text: string) => void;
+  onBlur?: () => void;
   error?: string;
 };
 
-export function BabyNameInput({ value, onChangeText, error }: BabyNameInputProps) {
-  const theme = useAppColors();
-
+export function BabyNameInput({
+  value,
+  onChangeText,
+  onBlur,
+  error,
+}: BabyNameInputProps) {
   return (
-    <View style={styles.container}>
-      <AppText variant="label">Baby Name</AppText>
+    <View className="gap-2">
+      <AppText variant="label" nativeID="baby-name-label">
+        Baby Name
+      </AppText>
       <InputField
         value={value}
         onChangeText={onChangeText}
+        onBlur={onBlur}
+        error={!!error}
         accessibilityLabel="Baby Name"
-        placeholder="Enter baby name"
+        accessibilityLabelledBy="baby-name-label"
+        placeholder="e.g. Nami"
         autoCapitalize="words"
         returnKeyType="next"
-        style={[
-          styles.input,
-          {
-            color: theme.textPrimary,
-          },
-        ]}
       />
       {error ? (
         <AppText variant="caption" color="danger">
@@ -38,12 +40,3 @@ export function BabyNameInput({ value, onChangeText, error }: BabyNameInputProps
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    gap: spacing[2],
-  },
-  input: {
-    borderRadius: radius.lg,
-  },
-});
