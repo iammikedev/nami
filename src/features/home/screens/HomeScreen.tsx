@@ -1,3 +1,4 @@
+import { useFocusEffect } from "@react-navigation/native";
 import { useRealm } from "@realm/react";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Animated, StyleSheet, View } from "react-native";
@@ -10,6 +11,11 @@ import { homeDailyHubMock } from "@/src/features/home/data/home.mock";
 import type { SummaryType } from "@/src/features/home/types/home.types";
 import { useHomeStore } from "@/src/features/home/store/homeStore";
 import { buildTodaySummaryItems } from "@/src/features/home/utils/summary";
+import {
+  buildUpcomingReminderLines,
+  UpcomingReminderCard,
+  useReminderStore,
+} from "@/src/features/reminders";
 import { QuickLogSheet } from "@/src/features/quick-log";
 import type { LogType } from "@/src/features/quick-log/types/quickLog.types";
 import { AppScreen, AppText } from "@/src/ui/components";
@@ -30,6 +36,13 @@ export function HomeScreen() {
   const todaySummary = useHomeStore((state) => state.todaySummary);
   const recentActivities = useHomeStore((state) => state.recentActivities);
   const refreshHomeData = useHomeStore((state) => state.refreshHomeData);
+
+  const hydrateReminders = useReminderStore((s) => s.hydrate);
+  const feedingReminderEnabled = useReminderStore((s) => s.feedingEnabled);
+  const feedingIntervalMinutes = useReminderStore((s) => s.feedingIntervalMinutes);
+  const sleepReminderEnabled = useReminderStore((s) => s.sleepEnabled);
+  const sleepIntervalMinutes = useReminderStore((s) => s.sleepIntervalMinutes);
+  const [reminderPreviewKey, setReminderPreviewKey] = useState(0);
 
   const fadeIn = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(10)).current;
@@ -54,6 +67,36 @@ export function HomeScreen() {
   useEffect(() => {
     refreshHomeData(realm);
   }, [realm, refreshHomeData]);
+
+  useEffect(() => {
+    hydrateReminders(realm);
+  }, [hydrateReminders, realm]);
+
+  useFocusEffect(
+    useCallback(() => {
+      setReminderPreviewKey((k) => k + 1);
+    }, [])
+  );
+
+  const reminderPrefs = useMemo(
+    () => ({
+      feedingEnabled: feedingReminderEnabled,
+      feedingIntervalMinutes,
+      sleepEnabled: sleepReminderEnabled,
+      sleepIntervalMinutes,
+    }),
+    [
+      feedingIntervalMinutes,
+      feedingReminderEnabled,
+      sleepIntervalMinutes,
+      sleepReminderEnabled,
+    ]
+  );
+
+  const upcomingReminderLines = useMemo(() => {
+    void reminderPreviewKey;
+    return buildUpcomingReminderLines(reminderPrefs, realm);
+  }, [realm, reminderPrefs, reminderPreviewKey]);
 
   const showFlashMessage = useCallback(
     (message: string) => {
@@ -123,6 +166,7 @@ export function HomeScreen() {
             onClose={closeQuickLog}
             onLogComplete={(message) => {
               refreshHomeData(realm);
+              setReminderPreviewKey((k) => k + 1);
               showFlashMessage(message);
             }}
           />
@@ -172,6 +216,11 @@ export function HomeScreen() {
       >
         <HomeHeader baby={babyProfile ?? homeDailyHubMock.baby} />
         <TodaySummary dateLabel={dateLabel} items={summaryItems} onCardPress={openQuickLogForSummary} />
+        <UpcomingReminderCard
+          lines={upcomingReminderLines}
+          anyEnabled={feedingReminderEnabled || sleepReminderEnabled}
+          refreshKey={reminderPreviewKey}
+        />
         <RecentActivityList items={recentActivities} />
       </Animated.View>
     </AppScreen>

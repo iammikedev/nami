@@ -62,7 +62,11 @@ export default function TabLayout() {
         options={{
           title: "Milestones",
           tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="star-outline" size={22} color={color} />
+            <MaterialCommunityIcons
+              name="star-outline"
+              size={22}
+              color={color}
+            />
           ),
         }}
       />
