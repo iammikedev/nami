@@ -1,41 +1,16 @@
 import React from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { VStack } from "native-base";
 
-import { spacing, useAppColors } from "@/src/ui/theme";
+import { spacing } from "../theme";
 import { AppText } from "./AppText";
 
-type SectionHeaderProps = {
-  title: string;
-  actionLabel?: string;
-  onActionPress?: () => void;
-};
+type SectionHeaderProps = { title: string; subtitle?: string };
 
-export function SectionHeader({
-  title,
-  actionLabel,
-  onActionPress,
-}: SectionHeaderProps) {
-  const theme = useAppColors();
-
+export function SectionHeader({ title, subtitle }: SectionHeaderProps) {
   return (
-    <View style={styles.row}>
-      <AppText variant="titleSmall">{title}</AppText>
-      {actionLabel ? (
-        <Pressable accessibilityRole="button" onPress={onActionPress}>
-          <AppText variant="bodySmall" color={theme.textSecondary}>
-            {actionLabel}
-          </AppText>
-        </Pressable>
-      ) : null}
-    </View>
+    <VStack space={spacing[1]}>
+      <AppText variant="h2">{title}</AppText>
+      {subtitle ? <AppText variant="bodySmall" color="textSecondary">{subtitle}</AppText> : null}
+    </VStack>
   );
 }
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: spacing[3],
-  },
-});

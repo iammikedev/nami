@@ -1,47 +1,32 @@
 import React from "react";
-import { Pressable, StyleProp, StyleSheet, ViewStyle } from "react-native";
+import { Pressable } from "native-base";
 
-import { animations, layout, radius, spacing, useAppColors } from "@/src/ui/theme";
+import { radius, spacing, useNamiColors } from "../theme";
 import { AppText } from "./AppText";
 
-type ChipProps = {
-  label: string;
-  selected?: boolean;
-  onPress?: () => void;
-  style?: StyleProp<ViewStyle>;
-};
+type ChipProps = { label: string; selected?: boolean; onPress?: () => void };
 
-export function Chip({ label, selected, onPress, style }: ChipProps) {
-  const theme = useAppColors();
-
+export function Chip({ label, selected, onPress }: ChipProps) {
+  const theme = useNamiColors();
   return (
     <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={label}
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.base,
+      style={[
         {
-          minHeight: layout.touchMin,
+          borderWidth: 1,
+          borderRadius: radius.pill,
+          paddingHorizontal: spacing[3],
+          paddingVertical: spacing[1],
+          minHeight: 32,
+          justifyContent: "center",
+        },
+        {
           backgroundColor: selected ? theme.primary : theme.surfaceElevated,
           borderColor: selected ? theme.primary : theme.border,
-          opacity: pressed ? animations.opacity.pressIn : animations.opacity.pressOut,
         },
-        style,
       ]}
     >
-      <AppText variant="bodySmall">{label}</AppText>
+      <AppText variant="label" color={selected ? "textPrimary" : "textSecondary"}>{label}</AppText>
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  base: {
-    borderWidth: 1,
-    borderRadius: radius.pill,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: spacing[4],
-    paddingVertical: spacing[2],
-  },
-});

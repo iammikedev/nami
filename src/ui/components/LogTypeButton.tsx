@@ -1,80 +1,46 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import React, { ComponentProps } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import React from "react";
+import { Box, Pressable, VStack } from "native-base";
 
-import {
-  animations,
-  colors,
-  iconSizes,
-  layout,
-  radius,
-  spacing,
-  useAppColors,
-} from "@/src/ui/theme";
+import { ActivityType, radius, shadows, spacing, useNamiColors } from "../theme";
 import { AppText } from "./AppText";
 
-type ActivityType = keyof typeof colors.light.activity;
-type IconName = ComponentProps<typeof MaterialCommunityIcons>["name"];
-
-const activityIcons: Record<ActivityType, IconName> = {
+const iconMap: Record<ActivityType, keyof typeof MaterialCommunityIcons.glyphMap> = {
   feed: "baby-bottle-outline",
-  sleep: "sleep",
+  sleep: "power-sleep",
   diaper: "baby-face-outline",
   milestone: "star-outline",
 };
 
-type LogTypeButtonProps = {
-  type: ActivityType;
-  label: string;
-  onPress?: () => void;
-};
+type LogTypeButtonProps = { type: ActivityType; label: string; onPress?: () => void };
 
 export function LogTypeButton({ type, label, onPress }: LogTypeButtonProps) {
-  const theme = useAppColors();
-
+  const theme = useNamiColors();
   return (
     <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={`Log ${label}`}
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.base,
-        {
-          backgroundColor: theme.surfaceElevated,
-          borderColor: theme.border,
-          opacity: pressed ? animations.opacity.pressIn : animations.opacity.pressOut,
-          transform: [{ scale: pressed ? animations.scale.pressIn : animations.scale.pressOut }],
-        },
+      style={({ isPressed }) => [
+        { alignItems: "center", minWidth: 74, gap: spacing[2], opacity: isPressed ? 0.85 : 1 },
       ]}
     >
-      <View style={[styles.iconWrap, { backgroundColor: theme.activity[type] }]}>
-        <MaterialCommunityIcons
-          name={activityIcons[type]}
-          size={iconSizes.md}
-          color={theme.textPrimary}
-        />
-      </View>
-      <AppText variant="bodyEmphasis">{label}</AppText>
+      <Box
+        style={[
+          {
+            width: 64,
+            height: 64,
+            borderRadius: radius.lg,
+            alignItems: "center",
+            justifyContent: "center",
+          },
+          shadows.sm,
+          { backgroundColor: theme.activity[type] },
+        ]}
+      >
+        <MaterialCommunityIcons name={iconMap[type]} size={20} color={theme.textPrimary} />
+      </Box>
+      <VStack>
+        <AppText variant="label">{label}</AppText>
+      </VStack>
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  base: {
-    minHeight: layout.touchMin + 10,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    paddingHorizontal: spacing[4],
-    paddingVertical: spacing[3],
-    alignItems: "center",
-    gap: spacing[2],
-    flex: 1,
-  },
-  iconWrap: {
-    width: 38,
-    height: 38,
-    borderRadius: radius.md,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

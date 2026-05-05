@@ -1,58 +1,59 @@
 import React, { PropsWithChildren } from "react";
-import { ScrollView, StyleProp, StyleSheet, View, ViewStyle } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Box, ScrollView } from "native-base";
+import {
+  SafeAreaView,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
 
-import { layout, spacing, useAppColors } from "@/src/ui/theme";
+import { spacing, useNamiColors } from "../theme";
 
 type AppScreenProps = PropsWithChildren<{
   scrollable?: boolean;
-  contentStyle?: StyleProp<ViewStyle>;
   style?: StyleProp<ViewStyle>;
+  contentStyle?: StyleProp<ViewStyle>;
 }>;
 
 export function AppScreen({
   children,
   scrollable = false,
-  contentStyle,
   style,
+  contentStyle,
 }: AppScreenProps) {
-  const theme = useAppColors();
+  const theme = useNamiColors();
 
-  if (scrollable) {
-    return (
-      <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }, style]}>
+  return (
+    <SafeAreaView style={[{ flex: 1, backgroundColor: theme.background }, style]}>
+      {scrollable ? (
         <ScrollView
           contentContainerStyle={[
-            styles.content,
-            { paddingBottom: spacing[12] },
+            {
+              paddingHorizontal: spacing[5],
+              paddingTop: spacing[4],
+              paddingBottom: spacing[4],
+            },
             contentStyle,
           ]}
+          keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
           {children}
         </ScrollView>
-      </SafeAreaView>
-    );
-  }
-
-  return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }, style]}>
-      <View style={[styles.content, contentStyle]}>{children}</View>
+      ) : (
+        <Box
+          style={[
+            {
+              flex: 1,
+              paddingHorizontal: spacing[5],
+              paddingTop: spacing[4],
+              paddingBottom: spacing[4],
+            },
+            contentStyle,
+          ]}
+        >
+          {children}
+        </Box>
+      )}
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  content: {
-    flexGrow: 1,
-    width: "100%",
-    maxWidth: layout.maxContentWidth,
-    paddingHorizontal: layout.screenHorizontalPadding,
-    alignSelf: "center",
-    paddingTop: spacing[4],
-    gap: layout.sectionGap,
-  },
-});

@@ -1,10 +1,10 @@
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { Box, HStack, VStack } from "native-base";
 
-import { iconSizes, radius, spacing, useAppColors } from "@/src/ui/theme";
+import { radius, spacing, useNamiColors } from "../theme";
 import { AppButton } from "./AppButton";
 import { AppText } from "./AppText";
+import { Card } from "./Card";
 
 type EmptyStateProps = {
   title: string;
@@ -19,43 +19,31 @@ export function EmptyState({
   actionLabel,
   onActionPress,
 }: EmptyStateProps) {
-  const theme = useAppColors();
+  const theme = useNamiColors();
 
   return (
-    <View style={[styles.base, { borderColor: theme.border, backgroundColor: theme.muted }]}>
-      <View style={[styles.iconWrap, { backgroundColor: theme.surfaceElevated }]}>
-        <MaterialCommunityIcons
-          name="baby-face-outline"
-          size={iconSizes.lg}
-          color={theme.textSecondary}
-        />
-      </View>
-      <AppText variant="titleSmall" align="center">
-        {title}
-      </AppText>
-      <AppText variant="bodySmall" color={theme.textSecondary} align="center">
-        {message}
-      </AppText>
+    <Card style={{ alignItems: "center", gap: spacing[3] }}>
+      <HStack
+        style={{
+          width: 72,
+          height: 72,
+          borderRadius: radius.xxl,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: theme.surface,
+          gap: spacing[2],
+        }}
+      >
+        <Box style={{ width: 18, height: 18, borderRadius: radius.pill, backgroundColor: theme.activity.feed }} />
+        <Box style={{ width: 18, height: 18, borderRadius: radius.pill, backgroundColor: theme.activity.sleep }} />
+      </HStack>
+      <AppText variant="h3">{title}</AppText>
+      <AppText color="textSecondary">{message}</AppText>
       {actionLabel ? (
-        <AppButton label={actionLabel} onPress={onActionPress} variant="secondary" />
+        <VStack alignSelf="stretch" mt={spacing[1]}>
+          <AppButton label={actionLabel} onPress={onActionPress} />
+        </VStack>
       ) : null}
-    </View>
+    </Card>
   );
 }
-
-const styles = StyleSheet.create({
-  base: {
-    borderWidth: 1,
-    borderRadius: radius.xl,
-    padding: spacing[6],
-    gap: spacing[3],
-    alignItems: "center",
-  },
-  iconWrap: {
-    width: 52,
-    height: 52,
-    borderRadius: radius.pill,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

@@ -1,38 +1,59 @@
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { Box, HStack, VStack } from "native-base";
 
-import { spacing, useAppColors } from "@/src/ui/theme";
+import { ActivityType, radius, spacing, useNamiColors } from "../theme";
 import { AppText } from "./AppText";
 import { Card } from "./Card";
 
 type SummaryCardProps = {
   label: string;
   value: string;
-  helper?: string;
+  helper: string;
+  type?: ActivityType;
 };
 
-export function SummaryCard({ label, value, helper }: SummaryCardProps) {
-  const theme = useAppColors();
-
+export function SummaryCard({
+  label,
+  value,
+  helper,
+  type = "feed",
+}: SummaryCardProps) {
+  const theme = useNamiColors();
   return (
-    <Card elevated>
-      <View style={styles.wrap}>
-        <AppText variant="caption" color={theme.textSecondary}>
+    <Card style={{ flexDirection: "row", alignItems: "center", gap: spacing[3], padding: spacing[3] }}>
+      <Box
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: radius.lg,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: theme.activity[type],
+        }}
+      >
+        <MaterialCommunityIcons
+          name="baby-bottle-outline"
+          size={18}
+          color={theme.textPrimary}
+        />
+      </Box>
+      <VStack flex={1} space={0.5}>
+        <AppText variant="label" color="textSecondary">
           {label}
         </AppText>
-        <AppText variant="titleSmall">{value}</AppText>
-        {helper ? (
-          <AppText variant="bodySmall" color={theme.textSecondary}>
-            {helper}
-          </AppText>
-        ) : null}
-      </View>
+        <AppText variant="title">{value}</AppText>
+        <AppText variant="caption" color="textSecondary">
+          {helper}
+        </AppText>
+      </VStack>
+      <HStack>
+        <MaterialCommunityIcons
+          name="chevron-right"
+          size={18}
+          color={theme.textSecondary}
+        />
+      </HStack>
     </Card>
   );
 }
-
-const styles = StyleSheet.create({
-  wrap: {
-    gap: spacing[1],
-  },
-});

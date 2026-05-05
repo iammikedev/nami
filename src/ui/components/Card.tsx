@@ -1,38 +1,33 @@
-import React, { PropsWithChildren } from "react";
-import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
+import React from "react";
+import { Box } from "native-base";
+import {
+  StyleProp,
+  ViewProps,
+  ViewStyle,
+} from "react-native";
 
-import { radius, shadows, spacing, useAppColors } from "@/src/ui/theme";
+import { radius, shadows, spacing, useNamiColors } from "../theme";
 
-type CardProps = PropsWithChildren<{
-  style?: StyleProp<ViewStyle>;
+type CardProps = ViewProps & {
   elevated?: boolean;
-}>;
+  style?: StyleProp<ViewStyle>;
+};
 
-export function Card({ children, style, elevated = false }: CardProps) {
-  const theme = useAppColors();
-
+export function Card({ elevated = true, style, ...props }: CardProps) {
+  const theme = useNamiColors();
   return (
-    <View
+    <Box
+      {...props}
       style={[
-        styles.base,
         {
-          backgroundColor: theme.surfaceElevated,
-          borderColor: theme.border,
+          borderWidth: 1,
+          borderRadius: radius.xxl,
+          padding: spacing[4],
         },
-        elevated ? shadows.md : shadows.sm,
+        { backgroundColor: theme.surfaceElevated, borderColor: theme.border },
+        elevated && shadows.md,
         style,
       ]}
-    >
-      {children}
-    </View>
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  base: {
-    borderWidth: 1,
-    borderRadius: radius.lg,
-    padding: spacing[4],
-    gap: spacing[2],
-  },
-});
